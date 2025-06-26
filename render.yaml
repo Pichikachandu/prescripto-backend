@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: prescripto-backend
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        value: mongodb+srv://chandupichika:chandu0410@cluster0.juzs3lf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      - key: CLOUDINARY_NAME
+        value: dlgq89kur
+      - key: CLOUDINARY_API_KEY
+        value: '252861682825873'
+      - key: CLOUDINARY_API_SECRET
+        value: AVD9tdM4fSQXhVjXZcIQ6nqLbSk
+      - key: JWT_SECRET
+        value: greatstack
+      - key: ADMIN_EMAIL
+        value: admin@docspot.com
+      - key: ADMIN_PASSWORD
+        value: 12345678
+    healthCheckPath: /api/health
+    plan: free

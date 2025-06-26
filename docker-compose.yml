@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: prescripto-backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - NODE_ENV=development
+      - PORT=4000
+    ports:
+      - "4000:4000"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+      - ./uploads:/usr/src/app/uploads
+    networks:
+      - prescripto-network
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:6.0
+    container_name: mongo
+    restart: always
+    environment:
+      - MONGO_INITDB_DATABASE=prescripto
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - prescripto-network
+
+networks:
+  prescripto-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
