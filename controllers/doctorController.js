@@ -15,15 +15,52 @@ const changeAvailability = async (req,res) => {
     }
 }
 
-const doctorList = async (req,res) =>{
-    try{
-        const doctors = await doctorModel.find({}).select(['-password', '-email']);
-        res.json({success: true, doctors});
-    } catch(error){
-        console.log(error);
-        res.status(500).json({success: false, message: error.message});
+const doctorList = async (req, res) => {
+    try {
+        console.log('🔍 Fetching doctors from database...');
+        
+        // Log the database connection info
+        const db = mongoose.connection;
+        console.log('📊 Database info:', {
+            dbName: db.name,
+            host: db.host,
+            port: db.port,
+            collections: (await db.db.listCollections().toArray()).map(c => c.name)
+        });
+        
+        // Check if the collection exists
+        const collections = await db.db.listCollections({ name: 'doctors' }).toArray();
+        if (collections.length === 0) {
+            console.warn('⚠️  Warning: "doctors" collection does not exist in the database');
+        } else {
+            console.log('✅ Found "doctors" collection');
+            
+            // Check document count
+            const count = await doctorModel.countDocuments();
+            console.log(`📊 Found ${count} doctors in the database`);
+            
+            if (count === 0) {
+                console.log('ℹ️  No doctors found in the database');
+            }
+        }
+        
+        // Execute the query with logging
+        const query = doctorModel.find({}).select(['-password', '-email']);
+        console.log('🔍 Executing query:', query.getFilter());
+        
+        const doctors = await query.exec();
+        console.log(`✅ Found ${doctors.length} doctors`);
+        
+        res.json({ success: true, doctors });
+    } catch (error) {
+        console.error('❌ Error in doctorList:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to fetch doctors',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
-}
+};
 
 // API for Doctor Login
 const loginDoctor = async (req, res) => {
