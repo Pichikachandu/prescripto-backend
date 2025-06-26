@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import doctorModel from "../models/doctorModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
