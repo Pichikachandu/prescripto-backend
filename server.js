@@ -22,13 +22,13 @@ connectDB();
 connectCloudinary();
 
 // Middleware setup
-app.use(cors(corsOptions)); // Use custom CORS configuration
+app.use(corsOptions); // Use the pre-configured CORS middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Body parsing middleware - important to handle JSON and URL-encoded data
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+// Remove duplicate body parsers
+// app.use(express.json({ limit: '50mb' }));
+// app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Log all requests
 app.use((req, res, next) => {
