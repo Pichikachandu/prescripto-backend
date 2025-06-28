@@ -228,6 +228,66 @@ const adminDashboard = async (req, res) => {
   }
 }
 
+// API to mark appointment as completed
+const appointmentComplete = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { appointmentId } = req.body;
+
+    if (!appointmentId) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({ success: false, message: "Appointment ID is required" });
+    }
+
+    const appointment = await appointmentModel.findById(appointmentId).session(session);
+    if (!appointment) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ success: false, message: "Appointment not found" });
+    }
+
+    // Check if already completed
+    if (appointment.isCompleted) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({ success: false, message: "Appointment is already marked as completed" });
+    }
+
+    // Mark appointment as completed
+    const updatedAppointment = await appointmentModel.findByIdAndUpdate(
+      appointmentId,
+      { $set: { isCompleted: true, completedAt: new Date() } },
+      { session, new: true }
+    );
+
+    // Commit the transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(200).json({
+      success: true,
+      message: "Appointment marked as completed successfully",
+      appointment: updatedAppointment
+    });
+
+  } catch (error) {
+    // If there's an error, abort the transaction
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
+    session.endSession();
+    console.error('Error completing appointment:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error completing appointment',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
 // Initialize router
 const router = express.Router();
 
