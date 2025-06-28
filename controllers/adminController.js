@@ -235,6 +235,7 @@ const router = express.Router();
 router.post('/add-doctor', authAdmin, upload.single('image'), addDoctor);
 router.get('/all-doctors', authAdmin, allDoctors);
 router.post('/login', loginAdmin);
+router.post('/appointment-complete', authAdmin, appointmentComplete);
 
 // Export the router as default and named exports for individual functions
 export {
@@ -243,6 +244,7 @@ export {
   allDoctors,
   appointmentsAdmin,
   appointmentCancel,
+  appointmentComplete,
   adminDashboard
 };
 
